@@ -1,6 +1,7 @@
 import Sidebar from "@/components/Sidebar";
 import OverviewCards from "@/components/OverviewCards";
 import RecentTransactions from "@/components/RecentTransactions";
+import AnalyticsChart from "@/components/AnalyticsChart";
 
 export default function Home() {
   return (
@@ -21,7 +22,7 @@ export default function Home() {
         </header>
 
         <OverviewCards />
-
+        <AnalyticsChart />
         <RecentTransactions />
 
       </main>
