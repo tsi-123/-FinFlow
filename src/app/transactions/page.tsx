@@ -1,33 +1,25 @@
 "use client";
+
 import AddTransaction, {
   type Transaction,
 } from "@/components/AddTransaction";
-
 import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
-
-const transactions = [
-  { id: 1, name: "Monthly Salary", category: "Income", date: "2026-11-08", amount: 3500, type: "income" },
-  { id: 2, name: "Netflix Subscription", category: "Entertainment", date: "2026-11-07", amount: 15, type: "expense" },
-  { id: 3, name: "Shopping", category: "Shopping", date: "2026-11-06", amount: 120, type: "expense" },
-  { id: 4, name: "Freelance Project", category: "Income", date: "2026-11-05", amount: 450, type: "income" },
-  { id: 5, name: "Restaurant", category: "Food", date: "2026-11-04", amount: 65, type: "expense" },
-  { id: 6, name: "Electricity Bill", category: "Utilities", date: "2026-11-03", amount: 85, type: "expense" },
-  { id: 7, name: "Online Course", category: "Education", date: "2026-11-02", amount: 200, type: "expense" },
-  { id: 8, name: "Freelance Payment", category: "Income", date: "2026-11-01", amount: 600, type: "income" },
-  { id: 9, name: "Transportation", category: "Transport", date: "2026-10-30", amount: 40, type: "expense" },
-  { id: 10, name: "Project Bonus", category: "Income", date: "2026-10-28", amount: 300, type: "income" },
-];
+import { useTransactionStore } from "@/store/transactionStore";
 
 const ITEMS_PER_PAGE = 5;
 
 export default function TransactionsPage() {
+  const transactions = useTransactionStore((state) => state.transactions);
+  const addTransaction = useTransactionStore((state) => state.addTransaction);
+
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
-  const filteredTransactions = allTransactions
+
+  const filteredTransactions = [...transactions]
     .filter((transaction) => {
       const matchesSearch =
         transaction.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -52,7 +44,6 @@ export default function TransactionsPage() {
     });
 
   const totalPages = Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE);
-
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 
   const displayedTransactions = filteredTransactions.slice(
@@ -60,28 +51,32 @@ export default function TransactionsPage() {
     startIndex + ITEMS_PER_PAGE
   );
 
+  const handleAddTransaction = (transaction: Transaction) => {
+    addTransaction(transaction);
+    setCurrentPage(1);
+    setShowForm(false);
+  };
+
   return (
     <div className="flex min-h-screen">
       <Sidebar />
 
       <main className="min-w-0 flex-1 bg-slate-50 p-6 md:p-8">
         <header className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-  <div>
-    <h1 className="text-3xl font-bold text-slate-900">
-      Transactions
-    </h1>
-    <p className="mt-2 text-slate-500">
-      Manage and track all your financial activities.
-    </p>
-  </div>
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">Transactions</h1>
+            <p className="mt-2 text-slate-500">
+              Manage and track all your financial activities.
+            </p>
+          </div>
 
-  <button
-    onClick={() => setShowForm(true)}
-    className="rounded-lg bg-emerald-500 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-600"
-  >
-    + Add Transaction
-  </button>
-</header>
+          <button
+            onClick={() => setShowForm(true)}
+            className="rounded-lg bg-emerald-500 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-600"
+          >
+            + Add Transaction
+          </button>
+        </header>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row">
@@ -165,10 +160,11 @@ export default function TransactionsPage() {
                             : "text-rose-600"
                         }`}
                       >
-                        {transaction.type === "income" ? "+" : "-"}$
-                        {transaction.amount.toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                        })}
+                        {transaction.type === "income" ? "+" : "-"}${
+                          transaction.amount.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                          })
+                        }
                       </td>
                     </tr>
                   ))
@@ -189,8 +185,7 @@ export default function TransactionsPage() {
           <div className="mt-6 flex flex-col items-center justify-between gap-4 border-t border-slate-100 pt-5 sm:flex-row">
             <p className="text-sm text-slate-500">
               Showing {filteredTransactions.length === 0 ? 0 : startIndex + 1}–
-              {Math.min(startIndex + ITEMS_PER_PAGE, filteredTransactions.length)}{" "}
-              of {filteredTransactions.length} transactions
+              {Math.min(startIndex + ITEMS_PER_PAGE, filteredTransactions.length)} of {filteredTransactions.length} transactions
             </p>
 
             <div className="flex gap-2">
@@ -217,6 +212,13 @@ export default function TransactionsPage() {
           </div>
         </section>
       </main>
+
+      {showForm && (
+        <AddTransaction
+          onAdd={handleAddTransaction}
+          onClose={() => setShowForm(false)}
+        />
+      )}
     </div>
   );
 }

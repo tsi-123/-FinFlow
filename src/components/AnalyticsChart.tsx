@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useTransactionStore } from "@/store/transactionStore";
+
 import {
   BarChart,
   Bar,
@@ -12,61 +14,108 @@ import {
   Legend,
 } from "recharts";
 
-const chartData = {
-  Weekly: [
-    { month: "Mon", income: 500, expenses: 200 },
-    { month: "Tue", income: 700, expenses: 350 },
-    { month: "Wed", income: 400, expenses: 250 },
-    { month: "Thu", income: 900, expenses: 400 },
-    { month: "Fri", income: 650, expenses: 300 },
-    { month: "Sat", income: 800, expenses: 450 },
-    { month: "Sun", income: 600, expenses: 250 },
-  ],
-  Monthly: [
-    { month: "Week 1", income: 1800, expenses: 900 },
-    { month: "Week 2", income: 2200, expenses: 1100 },
-    { month: "Week 3", income: 1500, expenses: 800 },
-    { month: "Week 4", income: 2700, expenses: 1300 },
-  ],
-  Yearly: [
-    { month: "Jan", income: 4500, expenses: 2800 },
-    { month: "Feb", income: 5200, expenses: 3100 },
-    { month: "Mar", income: 4800, expenses: 2600 },
-    { month: "Apr", income: 6100, expenses: 3500 },
-    { month: "May", income: 5500, expenses: 2900 },
-    { month: "Jun", income: 7200, expenses: 3800 },
-    { month: "Jul", income: 6800, expenses: 3200 },
-    { month: "Aug", income: 7500, expenses: 4100 },
-    { month: "Sep", income: 6200, expenses: 3000 },
-    { month: "Oct", income: 8100, expenses: 4200 },
-    { month: "Nov", income: 7900, expenses: 3900 },
-    { month: "Dec", income: 9000, expenses: 4500 },
-  ],
-};
-
-type Period = keyof typeof chartData;
+type Period = "Weekly" | "Monthly" | "Yearly";
 
 export default function AnalyticsChart() {
+  const transactions = useTransactionStore(
+    (state) => state.transactions
+  );
+
   const [period, setPeriod] = useState<Period>("Yearly");
-  const currentData = chartData[period];
+  const [todayTimestamp, setTodayTimestamp] = useState<number | null>(null);
 
-const totalIncome = currentData.reduce(
-  (total, item) => total + item.income,
-  0
-);
+  useEffect(() => {
+    setTodayTimestamp(Date.now());
+  }, []);
 
-const totalExpenses = currentData.reduce(
-  (total, item) => total + item.expenses,
-  0
-);
+  const referenceDate = todayTimestamp ? new Date(todayTimestamp) : null;
 
-const netSavings = totalIncome - totalExpenses;
+  const chartData = (() => {
+    if (!referenceDate) {
+      return [];
+    }
 
-const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(amount);
+    const groups: Record<
+      string,
+      { income: number; expenses: number }
+    > = {};
+
+    transactions.forEach((transaction) => {
+      const [year, month, day] = transaction.date
+        .split("-")
+        .map(Number);
+
+      const date = new Date(year, month - 1, day);
+
+      let label = "";
+
+      if (period === "Weekly") {
+        const difference = Math.floor(
+          (
+            new Date(
+              referenceDate.getFullYear(),
+              referenceDate.getMonth(),
+              referenceDate.getDate()
+            ).getTime() -
+            date.getTime()
+          ) /
+            (1000 * 60 * 60 * 24)
+        );
+
+        if (difference < 0 || difference >= 7) return;
+
+        label = date.toLocaleDateString("en-US", {
+          weekday: "short",
+        });
+      } else if (period === "Monthly") {
+        if (
+          date.getFullYear() !== referenceDate.getFullYear() ||
+          date.getMonth() !== referenceDate.getMonth()
+        ) {
+          return;
+        }
+
+        label = `Week ${Math.ceil(day / 7)}`;
+      } else {
+        label = date.toLocaleDateString("en-US", {
+          month: "short",
+        });
+      }
+
+      if (!groups[label]) {
+        groups[label] = { income: 0, expenses: 0 };
+      }
+
+      if (transaction.type === "income") {
+        groups[label].income += transaction.amount;
+      } else {
+        groups[label].expenses += transaction.amount;
+      }
+    });
+
+    return Object.entries(groups).map(([month, values]) => ({
+      month,
+      ...values,
+    }));
+  })();
+
+  const totalIncome = chartData.reduce(
+    (total, item) => total + item.income,
+    0
+  );
+
+  const totalExpenses = chartData.reduce(
+    (total, item) => total + item.expenses,
+    0
+  );
+
+  const netSavings = totalIncome - totalExpenses;
+
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(amount);
 
   return (
     <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -98,50 +147,58 @@ const formatCurrency = (amount: number) =>
       </div>
 
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-  <div className="rounded-xl bg-emerald-50 p-4">
-    <p className="text-sm text-slate-500">Total Income</p>
-    <h3 className="mt-2 text-xl font-bold text-emerald-600">
-      {formatCurrency(totalIncome)}
-    </h3>
-  </div>
+        <div className="rounded-xl bg-emerald-50 p-4">
+          <p className="text-sm text-slate-500">Total Income</p>
+          <h3 className="mt-2 text-xl font-bold text-emerald-600">
+            {formatCurrency(totalIncome)}
+          </h3>
+        </div>
 
-  <div className="rounded-xl bg-rose-50 p-4">
-    <p className="text-sm text-slate-500">Total Expenses</p>
-    <h3 className="mt-2 text-xl font-bold text-rose-600">
-      {formatCurrency(totalExpenses)}
-    </h3>
-  </div>
+        <div className="rounded-xl bg-rose-50 p-4">
+          <p className="text-sm text-slate-500">Total Expenses</p>
+          <h3 className="mt-2 text-xl font-bold text-rose-600">
+            {formatCurrency(totalExpenses)}
+          </h3>
+        </div>
 
-  <div className="rounded-xl bg-blue-50 p-4">
-    <p className="text-sm text-slate-500">Net Savings</p>
-    <h3 className="mt-2 text-xl font-bold text-blue-600">
-      {formatCurrency(netSavings)}
-    </h3>
-  </div>
-</div>
+        <div className="rounded-xl bg-blue-50 p-4">
+          <p className="text-sm text-slate-500">Net Savings</p>
+          <h3 className="mt-2 text-xl font-bold text-blue-600">
+            {formatCurrency(netSavings)}
+          </h3>
+        </div>
+      </div>
 
       <div className="h-80 w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={currentData} barGap={8}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar
-              dataKey="income"
-              name="Income"
-              fill="#10b981"
-              radius={[5, 5, 0, 0]}
-            />
-            <Bar
-              dataKey="expenses"
-              name="Expenses"
-              fill="#f43f5e"
-              radius={[5, 5, 0, 0]}
-            />
-          </BarChart>
-        </ResponsiveContainer>
+        {chartData.length > 0 ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} barGap={8}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+
+              <Bar
+                dataKey="income"
+                name="Income"
+                fill="#10b981"
+                radius={[5, 5, 0, 0]}
+              />
+
+              <Bar
+                dataKey="expenses"
+                name="Expenses"
+                fill="#f43f5e"
+                radius={[5, 5, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex h-full items-center justify-center text-sm text-slate-400">
+            No transaction data available for this period.
+          </div>
+        )}
       </div>
     </section>
   );
