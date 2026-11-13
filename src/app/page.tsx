@@ -9,7 +9,7 @@ export default function Home() {
 
       <Sidebar />
 
-      <main className="min-w-0 flex-1 p-6 md:p-8">
+      <main className="min-w-0 flex-1 p-6 pt-24 md:p-8 md:pt-8">
 
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900">

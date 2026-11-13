@@ -1,61 +1,35 @@
 "use client";
 
 import { useState } from "react";
-
-const transactions = [
-  {
-    id: 1,
-    name: "Salary",
-    category: "Monthly salary",
-    date: "Nov 08, 2026",
-    amount: "+$3,500.00",
-    type: "income",
-  },
-  {
-    id: 2,
-    name: "Netflix",
-    category: "Entertainment",
-    date: "Nov 07, 2026",
-    amount: "-$15.00",
-    type: "expense",
-  },
-  {
-    id: 3,
-    name: "Shopping",
-    category: "Shopping",
-    date: "Nov 06, 2026",
-    amount: "-$120.00",
-    type: "expense",
-  },
-  {
-    id: 4,
-    name: "Freelance Project",
-    category: "Additional income",
-    date: "Nov 05, 2026",
-    amount: "+$450.00",
-    type: "income",
-  },
-];
+import { useTransactionStore } from "@/store/transactionStore";
 
 export default function RecentTransactions() {
+  const transactions = useTransactionStore(
+    (state) => state.transactions
+  );
+
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
 
-  const filteredTransactions = transactions.filter((transaction) => {
-    const matchesSearch =
-      transaction.name.toLowerCase().includes(search.toLowerCase()) ||
-      transaction.category.toLowerCase().includes(search.toLowerCase());
+  const filteredTransactions = [...transactions]
+    .filter((transaction) => {
+      const matchesSearch =
+        transaction.name.toLowerCase().includes(search.toLowerCase()) ||
+        transaction.category.toLowerCase().includes(search.toLowerCase());
 
-    const matchesFilter =
-      filter === "all" || transaction.type === filter;
+      const matchesFilter =
+        filter === "all" || transaction.type === filter;
 
-    return matchesSearch && matchesFilter;
-  });
+      return matchesSearch && matchesFilter;
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+    )
+    .slice(0, 5);
 
   return (
     <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-
-      {/* Section heading */}
       <div className="mb-6">
         <h2 className="text-lg font-bold text-slate-900">
           Recent Transactions
@@ -66,9 +40,7 @@ export default function RecentTransactions() {
         </p>
       </div>
 
-      {/* Search and filter */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row">
-
         <input
           type="text"
           placeholder="Search transactions..."
@@ -86,13 +58,10 @@ export default function RecentTransactions() {
           <option value="income">Income</option>
           <option value="expense">Expenses</option>
         </select>
-
       </div>
 
-      {/* Transactions table */}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[600px] text-left">
-
           <thead>
             <tr className="border-b border-slate-100 text-xs uppercase text-slate-400">
               <th className="pb-4 font-medium">Name</th>
@@ -118,17 +87,28 @@ export default function RecentTransactions() {
                   </td>
 
                   <td className="py-5 text-sm text-slate-500">
-                    {transaction.date}
+                    {new Date(transaction.date).toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                        timeZone: "UTC",
+                      }
+                    )}
                   </td>
 
                   <td
                     className={`py-5 text-right text-sm font-semibold ${
                       transaction.type === "income"
                         ? "text-emerald-600"
-                        : "text-slate-800"
+                        : "text-rose-600"
                     }`}
                   >
-                    {transaction.amount}
+                    {transaction.type === "income" ? "+" : "-"}$
+                    {transaction.amount.toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                    })}
                   </td>
                 </tr>
               ))
@@ -143,14 +123,12 @@ export default function RecentTransactions() {
               </tr>
             )}
           </tbody>
-
         </table>
       </div>
 
       <p className="mt-4 text-xs text-slate-400">
-        Showing {filteredTransactions.length} of {transactions.length} transactions
+        Showing {filteredTransactions.length} recent transactions
       </p>
-
     </section>
   );
 }

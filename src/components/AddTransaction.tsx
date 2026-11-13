@@ -12,33 +12,52 @@ export type Transaction = {
 };
 
 type AddTransactionProps = {
-  onAdd: (transaction: Transaction) => void;
+  onSave: (transaction: Transaction) => void;
   onClose: () => void;
+  initialTransaction?: Transaction;
 };
 
 export default function AddTransaction({
-  onAdd,
+  onSave,
   onClose,
+  initialTransaction,
 }: AddTransactionProps) {
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState("Other");
-  const [amount, setAmount] = useState("");
-  const [type, setType] = useState<"income" | "expense">("expense");
+  const [name, setName] = useState(initialTransaction?.name ?? "");
+  const [category, setCategory] = useState(
+    initialTransaction?.category ?? "Other"
+  );
+  const [amount, setAmount] = useState(
+    initialTransaction?.amount.toString() ?? ""
+  );
+  const [type, setType] = useState<"income" | "expense">(
+    initialTransaction?.type ?? "expense"
+  );
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const numericAmount = Number(amount);
 
-    if (!name.trim() || !Number.isFinite(numericAmount) || numericAmount <= 0) {
+    if (
+      !name.trim() ||
+      !Number.isFinite(numericAmount) ||
+      numericAmount <= 0
+    ) {
       return;
     }
 
-    onAdd({
-      id: Date.now(),
+    const now = new Date();
+    const localDate = new Date(
+      now.getTime() - now.getTimezoneOffset() * 60000
+    )
+      .toISOString()
+      .split("T")[0];
+
+    onSave({
+      id: initialTransaction?.id ?? Date.now(),
       name: name.trim(),
       category,
-      date: new Date().toISOString().split("T")[0],
+      date: initialTransaction?.date ?? localDate,
       amount: numericAmount,
       type,
     });
@@ -54,14 +73,17 @@ export default function AddTransaction({
       >
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-xl font-bold text-slate-900">
-            Add Transaction
+            {initialTransaction ? "Edit Transaction" : "Add Transaction"}
           </h2>
+
           <button type="button" onClick={onClose} aria-label="Close">
             ✕
           </button>
         </div>
 
-        <label className="mb-2 block text-sm font-medium">Transaction name</label>
+        <label className="mb-2 block text-sm font-medium">
+          Transaction name
+        </label>
         <input
           required
           value={name}
@@ -98,7 +120,9 @@ export default function AddTransaction({
           <option>Utilities</option>
         </select>
 
-        <label className="mb-2 block text-sm font-medium">Transaction type</label>
+        <label className="mb-2 block text-sm font-medium">
+          Transaction type
+        </label>
         <select
           value={type}
           onChange={(event) =>
@@ -118,11 +142,12 @@ export default function AddTransaction({
           >
             Cancel
           </button>
+
           <button
             type="submit"
             className="flex-1 rounded-lg bg-emerald-500 py-3 text-sm font-semibold text-white hover:bg-emerald-600"
           >
-            Save Transaction
+            {initialTransaction ? "Save Changes" : "Save Transaction"}
           </button>
         </div>
       </form>
