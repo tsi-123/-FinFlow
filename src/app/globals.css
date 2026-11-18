@@ -1,8 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f5f8ff;
+  --foreground: #172554;
+
+  /* FinFlow Blue Palette */
+  --primary: #1e40af;
+  --primary-light: #3b82f6;
+  --primary-soft: #dbeafe;
+  --primary-pale: #eff6ff;
+  --primary-dark: #1e3a8a;
 }
 
 @theme inline {

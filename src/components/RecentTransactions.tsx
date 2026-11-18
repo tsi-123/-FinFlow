@@ -64,9 +64,9 @@ export default function RecentTransactions() {
 
   return (
     <>
-      <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="mt-8 rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
         <div className="mb-6">
-          <h2 className="text-lg font-bold text-slate-900">
+          <h2 className="text-lg font-bold text-blue-950">
             Recent Transactions
           </h2>
 
@@ -81,13 +81,13 @@ export default function RecentTransactions() {
             placeholder="Search transactions..."
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-emerald-500 sm:flex-1"
+            className="w-full rounded-lg border border-blue-100 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:flex-1"
           />
 
           <select
             value={filter}
             onChange={(event) => setFilter(event.target.value)}
-            className="rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-emerald-500"
+            className="rounded-lg border border-blue-100 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           >
             <option value="all">All transactions</option>
             <option value="income">Income</option>
@@ -98,7 +98,7 @@ export default function RecentTransactions() {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[750px] text-left">
             <thead>
-              <tr className="border-b border-slate-100 text-xs uppercase text-slate-400">
+              <tr className="border-b border-blue-100 text-xs uppercase text-slate-400">
                 <th className="pb-4 font-medium">Name</th>
                 <th className="pb-4 font-medium">Category</th>
                 <th className="pb-4 font-medium">Date</th>
@@ -112,9 +112,9 @@ export default function RecentTransactions() {
                 filteredTransactions.map((transaction) => (
                   <tr
                     key={transaction.id}
-                    className="border-b border-slate-50 last:border-0"
+                    className="border-b border-blue-50 transition-colors hover:bg-blue-50/40 last:border-0"
                   >
-                    <td className="py-5 text-sm font-semibold text-slate-800">
+                    <td className="py-5 text-sm font-semibold text-blue-950">
                       {transaction.name}
                     </td>
 
@@ -137,8 +137,8 @@ export default function RecentTransactions() {
                     <td
                       className={`py-5 text-right text-sm font-semibold ${
                         transaction.type === "income"
-                          ? "text-emerald-600"
-                          : "text-rose-600"
+                          ? "text-blue-500"
+                          : "text-blue-900"
                       }`}
                     >
                       {transaction.type === "income" ? "+" : "-"}$
@@ -151,7 +151,7 @@ export default function RecentTransactions() {
                       <div className="flex justify-end gap-3">
                         <button
                           onClick={() => handleEdit(transaction)}
-                          className="text-sm font-medium text-emerald-600 hover:text-emerald-800"
+                          className="text-sm font-medium text-blue-600 transition hover:text-blue-900"
                         >
                           Edit
                         </button>
@@ -160,7 +160,7 @@ export default function RecentTransactions() {
                           onClick={() =>
                             handleDelete(transaction.id, transaction.name)
                           }
-                          className="text-sm font-medium text-rose-600 hover:text-rose-800"
+                          className="text-sm font-medium text-blue-800 transition hover:text-blue-950"
                         >
                           Delete
                         </button>

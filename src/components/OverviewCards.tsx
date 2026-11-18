@@ -27,17 +27,20 @@ export default function OverviewCards() {
     {
       title: "Total Balance",
       amount: totalBalance,
-      color: "text-slate-900",
+      color: "text-blue-950",
+      accent: "bg-blue-950",
     },
     {
       title: "Total Income",
       amount: totalIncome,
-      color: "text-emerald-600",
+      color: "text-blue-600",
+      accent: "bg-blue-600",
     },
     {
       title: "Total Expenses",
       amount: totalExpenses,
-      color: "text-rose-600",
+      color: "text-blue-400",
+      accent: "bg-blue-400",
     },
   ];
 
@@ -46,8 +49,10 @@ export default function OverviewCards() {
       {overviewData.map((item) => (
         <div
           key={item.title}
-          className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+          className="relative overflow-hidden rounded-2xl border border-blue-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
         >
+          <div className={`absolute left-0 top-0 h-full w-1 ${item.accent}`} />
+
           <p className="text-sm font-medium text-slate-500">
             {item.title}
           </p>

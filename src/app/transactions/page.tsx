@@ -12,9 +12,11 @@ const ITEMS_PER_PAGE = 5;
 export default function TransactionsPage() {
   const transactions = useTransactionStore((state) => state.transactions);
   const addTransaction = useTransactionStore((state) => state.addTransaction);
+
   const updateTransaction = useTransactionStore(
     (state) => state.updateTransaction
   );
+
   const deleteTransaction = useTransactionStore(
     (state) => state.deleteTransaction
   );
@@ -42,10 +44,13 @@ export default function TransactionsPage() {
       switch (sort) {
         case "oldest":
           return new Date(a.date).getTime() - new Date(b.date).getTime();
+
         case "highest":
           return b.amount - a.amount;
+
         case "lowest":
           return a.amount - b.amount;
+
         default:
           return new Date(b.date).getTime() - new Date(a.date).getTime();
       }
@@ -99,14 +104,14 @@ export default function TransactionsPage() {
     <div className="flex min-h-screen">
       <Sidebar />
 
-      <main className="min-w-0 flex-1 bg-slate-50 p-6 md:p-8">
+      <main className="min-w-0 flex-1 bg-blue-50/40 p-6 pt-24 md:p-8 md:pt-8">
         <header className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">
+            <h1 className="text-3xl font-bold tracking-tight text-blue-950">
               Transactions
             </h1>
 
-            <p className="mt-2 text-slate-500">
+            <p className="mt-2 text-sm text-slate-500">
               Manage and track all your financial activities.
             </p>
           </div>
@@ -116,13 +121,13 @@ export default function TransactionsPage() {
               setEditingTransaction(null);
               setShowForm(true);
             }}
-            className="rounded-lg bg-emerald-500 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-600"
+            className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800"
           >
             + Add Transaction
           </button>
         </header>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
           <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row">
             <input
               type="text"
@@ -132,7 +137,7 @@ export default function TransactionsPage() {
                 setSearch(event.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-emerald-500 md:max-w-sm"
+              className="w-full rounded-lg border border-blue-100 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 md:max-w-sm"
             />
 
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -142,7 +147,7 @@ export default function TransactionsPage() {
                   setFilter(event.target.value);
                   setCurrentPage(1);
                 }}
-                className="rounded-lg border border-slate-200 px-4 py-3 text-sm"
+                className="rounded-lg border border-blue-100 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="all">All transactions</option>
                 <option value="income">Income</option>
@@ -152,7 +157,7 @@ export default function TransactionsPage() {
               <select
                 value={sort}
                 onChange={(event) => setSort(event.target.value)}
-                className="rounded-lg border border-slate-200 px-4 py-3 text-sm"
+                className="rounded-lg border border-blue-100 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="newest">Newest first</option>
                 <option value="oldest">Oldest first</option>
@@ -165,7 +170,7 @@ export default function TransactionsPage() {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[850px] text-left">
               <thead>
-                <tr className="border-b border-slate-100 text-xs uppercase text-slate-400">
+                <tr className="border-b border-blue-100 text-xs uppercase text-slate-400">
                   <th className="pb-4 font-medium">Transaction</th>
                   <th className="pb-4 font-medium">Category</th>
                   <th className="pb-4 font-medium">Date</th>
@@ -179,9 +184,9 @@ export default function TransactionsPage() {
                   displayedTransactions.map((transaction) => (
                     <tr
                       key={transaction.id}
-                      className="border-b border-slate-50 last:border-0"
+                      className="border-b border-blue-50 transition-colors hover:bg-blue-50/40 last:border-0"
                     >
-                      <td className="py-5 text-sm font-semibold text-slate-800">
+                      <td className="py-5 text-sm font-semibold text-blue-950">
                         {transaction.name}
                       </td>
 
@@ -204,8 +209,8 @@ export default function TransactionsPage() {
                       <td
                         className={`py-5 text-right text-sm font-semibold ${
                           transaction.type === "income"
-                            ? "text-emerald-600"
-                            : "text-rose-600"
+                            ? "text-blue-500"
+                            : "text-blue-900"
                         }`}
                       >
                         {transaction.type === "income" ? "+" : "-"}$
@@ -218,14 +223,14 @@ export default function TransactionsPage() {
                         <div className="flex justify-end gap-3">
                           <button
                             onClick={() => handleEdit(transaction)}
-                            className="text-sm font-medium text-emerald-600 hover:text-emerald-800"
+                            className="text-sm font-medium text-blue-600 transition hover:text-blue-900"
                           >
                             Edit
                           </button>
 
                           <button
                             onClick={() => handleDelete(transaction.id)}
-                            className="text-sm font-medium text-rose-500 hover:text-rose-700"
+                            className="text-sm font-medium text-blue-800 transition hover:text-blue-950"
                           >
                             Delete
                           </button>
@@ -247,7 +252,7 @@ export default function TransactionsPage() {
             </table>
           </div>
 
-          <div className="mt-6 flex flex-col items-center justify-between gap-4 border-t border-slate-100 pt-5 sm:flex-row">
+          <div className="mt-6 flex flex-col items-center justify-between gap-4 border-t border-blue-100 pt-5 sm:flex-row">
             <p className="text-sm text-slate-500">
               Showing{" "}
               {filteredTransactions.length === 0 ? 0 : startIndex + 1}–
@@ -262,19 +267,19 @@ export default function TransactionsPage() {
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((page) => page - 1)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-lg border border-blue-100 px-4 py-2 text-sm text-blue-900 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Previous
               </button>
 
-              <span className="flex items-center px-3 text-sm font-medium">
+              <span className="flex items-center px-3 text-sm font-medium text-blue-950">
                 {totalPages === 0 ? 0 : currentPage} / {totalPages}
               </span>
 
               <button
                 disabled={currentPage >= totalPages || totalPages === 0}
                 onClick={() => setCurrentPage((page) => page + 1)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-lg border border-blue-100 px-4 py-2 text-sm text-blue-900 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next
               </button>

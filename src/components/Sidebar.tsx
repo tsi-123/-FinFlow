@@ -19,7 +19,7 @@ export default function Sidebar() {
 
   const navigationLinks = (
     <nav className="flex-1">
-      <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
+      <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-blue-300/60">
         Menu
       </p>
 
@@ -29,10 +29,10 @@ export default function Sidebar() {
             key={item.name}
             href={item.href}
             onClick={() => setMenuOpen(false)}
-            className={`flex items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
+            className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 ${
               isActive(item.href)
-                ? "bg-emerald-500 text-white"
-                : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                ? "bg-blue-600 text-white shadow-lg shadow-blue-950/30"
+                : "text-blue-100/70 hover:bg-blue-900/60 hover:text-white"
             }`}
           >
             <span className="text-lg">{item.icon}</span>
@@ -46,9 +46,9 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile navigation header */}
-      <div className="fixed left-0 right-0 top-0 z-40 flex items-center justify-between bg-slate-950 px-5 py-4 text-white md:hidden">
+      <div className="fixed left-0 right-0 top-0 z-40 flex items-center justify-between bg-blue-950 px-5 py-4 text-white md:hidden">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500 font-bold">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 font-bold">
             F
           </div>
           <h1 className="text-xl font-bold">FinFlow</h1>
@@ -56,7 +56,7 @@ export default function Sidebar() {
 
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="rounded-lg p-2 text-xl hover:bg-slate-800"
+          className="rounded-lg p-2 text-xl hover:bg-blue-900"
           aria-label="Toggle navigation menu"
           aria-expanded={menuOpen}
         >
@@ -67,31 +67,31 @@ export default function Sidebar() {
       {/* Mobile menu overlay */}
       {menuOpen && (
         <div
-          className="fixed inset-0 z-40 bg-slate-950/50 md:hidden"
+          className="fixed inset-0 z-40 bg-blue-950/60 md:hidden"
           onClick={() => setMenuOpen(false)}
         />
       )}
 
       {/* Mobile sidebar */}
       <aside
-        className={`fixed bottom-0 left-0 top-[65px] z-50 flex w-64 flex-col bg-slate-950 px-5 py-7 text-white transition-transform duration-300 md:hidden ${
+        className={`fixed bottom-0 left-0 top-[65px] z-50 flex w-64 flex-col bg-blue-950 px-5 py-7 text-white transition-transform duration-300 md:hidden ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {navigationLinks}
 
-        <div className="border-t border-slate-800 pt-5">
+        <div className="border-t border-blue-900 pt-5">
           <p className="text-sm font-medium">Welcome back!</p>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-blue-200/60">
             Manage your money wisely.
           </p>
         </div>
       </aside>
 
       {/* Desktop sidebar */}
-      <aside className="hidden min-h-screen w-64 shrink-0 flex-col bg-slate-950 px-5 py-7 text-white md:flex">
+      <aside className="hidden min-h-screen w-64 shrink-0 flex-col bg-blue-950 px-5 py-7 text-white md:flex">
         <div className="mb-12 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 text-xl font-bold">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-xl font-bold">
             F
           </div>
           <h1 className="text-2xl font-bold tracking-tight">FinFlow</h1>
@@ -99,9 +99,9 @@ export default function Sidebar() {
 
         {navigationLinks}
 
-        <div className="border-t border-slate-800 pt-5">
+        <div className="border-t border-blue-900 pt-5">
           <p className="text-sm font-medium">Welcome back!</p>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-blue-200/60">
             Manage your money wisely.
           </p>
         </div>
