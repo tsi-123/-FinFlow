@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import type { FormEvent } from "react";
 import Sidebar from "@/components/Sidebar";
 import { useSettingsStore } from "@/store/settingsStore";
 
@@ -8,6 +9,7 @@ export default function SettingsPage() {
   const savedName = useSettingsStore((state) => state.name);
   const savedEmail = useSettingsStore((state) => state.email);
   const savedCurrency = useSettingsStore((state) => state.currency);
+  const hasHydrated = useSettingsStore((state) => state.hasHydrated);
 
   const updateProfile = useSettingsStore(
     (state) => state.updateProfile
@@ -17,19 +19,30 @@ export default function SettingsPage() {
     (state) => state.updateCurrency
   );
 
-  const [name, setName] = useState(savedName);
-  const [email, setEmail] = useState(savedEmail);
-  const [currency, setCurrency] = useState(savedCurrency);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [currency, setCurrency] = useState("USD");
   const [message, setMessage] = useState("");
 
-  function handleSaveProfile(event: React.FormEvent<HTMLFormElement>) {
+  // Load saved information after Zustand finishes hydration
+  useEffect(() => {
+    if (hasHydrated) {
+      setName(savedName);
+      setEmail(savedEmail);
+      setCurrency(savedCurrency);
+    }
+  }, [hasHydrated, savedName, savedEmail, savedCurrency]);
+
+  function handleSaveProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!name.trim() || !email.trim()) {
+      setMessage("Please enter your name and email address.");
       return;
     }
 
     updateProfile(name.trim(), email.trim());
+
     setMessage("Profile updated successfully!");
 
     setTimeout(() => setMessage(""), 3000);
@@ -37,9 +50,20 @@ export default function SettingsPage() {
 
   function handleSaveCurrency() {
     updateCurrency(currency);
+
     setMessage("Currency preference saved!");
 
     setTimeout(() => setMessage(""), 3000);
+  }
+
+  if (!hasHydrated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+        <p className="text-sm text-slate-500">
+          Loading your settings...
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -87,7 +111,7 @@ export default function SettingsPage() {
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-emerald-500"
-                placeholder="Enter your name"
+                placeholder="Enter your full name"
               />
             </div>
 
@@ -102,7 +126,7 @@ export default function SettingsPage() {
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-emerald-500"
-                placeholder="Enter your email"
+                placeholder="Enter your email address"
               />
             </div>
 

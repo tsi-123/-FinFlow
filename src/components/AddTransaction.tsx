@@ -22,6 +22,13 @@ export default function AddTransaction({
   onClose,
   initialTransaction,
 }: AddTransactionProps) {
+  const today = new Date();
+  const localDate = new Date(
+    today.getTime() - today.getTimezoneOffset() * 60000
+  )
+    .toISOString()
+    .split("T")[0];
+
   const [name, setName] = useState(initialTransaction?.name ?? "");
   const [category, setCategory] = useState(
     initialTransaction?.category ?? "Other"
@@ -32,6 +39,9 @@ export default function AddTransaction({
   const [type, setType] = useState<"income" | "expense">(
     initialTransaction?.type ?? "expense"
   );
+  const [date, setDate] = useState(
+    initialTransaction?.date ?? localDate
+  );
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -40,24 +50,18 @@ export default function AddTransaction({
 
     if (
       !name.trim() ||
+      !date ||
       !Number.isFinite(numericAmount) ||
       numericAmount <= 0
     ) {
       return;
     }
 
-    const now = new Date();
-    const localDate = new Date(
-      now.getTime() - now.getTimezoneOffset() * 60000
-    )
-      .toISOString()
-      .split("T")[0];
-
     onSave({
       id: initialTransaction?.id ?? Date.now(),
       name: name.trim(),
       category,
-      date: initialTransaction?.date ?? localDate,
+      date,
       amount: numericAmount,
       type,
     });
@@ -76,7 +80,12 @@ export default function AddTransaction({
             {initialTransaction ? "Edit Transaction" : "Add Transaction"}
           </h2>
 
-          <button type="button" onClick={onClose} aria-label="Close">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="text-slate-500 hover:text-slate-900"
+          >
             ✕
           </button>
         </div>
@@ -84,6 +93,7 @@ export default function AddTransaction({
         <label className="mb-2 block text-sm font-medium">
           Transaction name
         </label>
+
         <input
           required
           value={name}
@@ -92,7 +102,10 @@ export default function AddTransaction({
           className="mb-4 w-full rounded-lg border border-slate-200 p-3 text-sm"
         />
 
-        <label className="mb-2 block text-sm font-medium">Amount ($)</label>
+        <label className="mb-2 block text-sm font-medium">
+          Amount ($)
+        </label>
+
         <input
           required
           type="number"
@@ -104,13 +117,17 @@ export default function AddTransaction({
           className="mb-4 w-full rounded-lg border border-slate-200 p-3 text-sm"
         />
 
-        <label className="mb-2 block text-sm font-medium">Category</label>
+        <label className="mb-2 block text-sm font-medium">
+          Category
+        </label>
+
         <select
           value={category}
           onChange={(event) => setCategory(event.target.value)}
           className="mb-4 w-full rounded-lg border border-slate-200 p-3 text-sm"
         >
           <option>Other</option>
+          <option>Income</option>
           <option>Salary</option>
           <option>Food</option>
           <option>Shopping</option>
@@ -121,8 +138,21 @@ export default function AddTransaction({
         </select>
 
         <label className="mb-2 block text-sm font-medium">
+          Date
+        </label>
+
+        <input
+          required
+          type="date"
+          value={date}
+          onChange={(event) => setDate(event.target.value)}
+          className="mb-4 w-full rounded-lg border border-slate-200 p-3 text-sm"
+        />
+
+        <label className="mb-2 block text-sm font-medium">
           Transaction type
         </label>
+
         <select
           value={type}
           onChange={(event) =>
