@@ -29,13 +29,25 @@ export default function Sidebar() {
             key={item.name}
             href={item.href}
             onClick={() => setMenuOpen(false)}
-            className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 ${
+            className={`relative flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 ${
               isActive(item.href)
                 ? "bg-blue-600 text-white shadow-lg shadow-blue-950/30"
                 : "text-blue-100/70 hover:bg-blue-900/60 hover:text-white"
             }`}
           >
-            <span className="text-lg">{item.icon}</span>
+            {/* Active page indicator */}
+            {isActive(item.href) && (
+              <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-white" />
+            )}
+
+            <span
+              className={`text-lg ${
+                isActive(item.href) ? "text-white" : ""
+              }`}
+            >
+              {item.icon}
+            </span>
+
             <span className="text-sm font-medium">{item.name}</span>
           </Link>
         ))}
